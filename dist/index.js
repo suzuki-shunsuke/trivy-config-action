@@ -11068,6 +11068,7 @@ const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
     }
+    core.info(JSON.stringify(diagnostics));
     if (inputs.githubComment && diagnostics.length > 0) {
         const table = generateTable(diagnostics, inputs.workingDirectory);
         const githubCommentTemplate = `## :x: Trivy error
