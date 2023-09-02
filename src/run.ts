@@ -153,6 +153,7 @@ ${table}`;
       },
       diagnostics: diagnostics,
     })),
+    cwd: inputs.workingDirectory,
     env: {
       ...process.env,
       REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,

@@ -11093,6 +11093,7 @@ ${table}`;
             },
             diagnostics: diagnostics,
         })),
+        cwd: inputs.workingDirectory,
         env: Object.assign(Object.assign({}, process.env), { REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken }),
     });
 });
