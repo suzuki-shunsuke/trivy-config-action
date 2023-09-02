@@ -1,0 +1,82 @@
+name: test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  path-filter:
+    outputs:
+      update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
+      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
+      ghalint: ${{steps.changes.outputs.ghalint}}
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
+        id: changes
+        with:
+          filters: |
+            update-aqua-checksums:
+              - aqua/aqua.yaml
+              - aqua/imports/*.yaml
+              - aqua/aqua-checksums.json
+              - .github/workflows/test.yaml
+            renovate-config-validator:
+              - renovate.json5
+              - .github/workflows/test.yaml
+              - .github/workflows/wc-renovate-config-validator.yaml
+            ghalint:
+              - .github/workflows/*.yaml
+              - aqua/imports/ghalint.yaml
+
+  status-check:
+    runs-on: ubuntu-latest
+    needs:
+      - update-aqua-checksums
+      - test
+      - renovate-config-validator
+      - ghalint
+    permissions: {}
+    if: failure()
+    steps:
+      - run: exit 1
+
+  enable-auto-merge:
+    uses: ./.github/workflows/wc-enable-auto-merge.yaml
+    secrets: inherit
+    permissions: {}
+    needs:
+      - status-check
+    if: |
+      ! failure() && ! cancelled() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
+
+  ghalint:
+    uses: ./.github/workflows/wc-ghalint.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.ghalint == 'true'
+    permissions: {}
+
+  renovate-config-validator:
+    uses: ./.github/workflows/wc-renovate-config-validator.yaml
+    needs: path-filter
+    if: needs.path-filter.outputs.renovate-config-validator == 'true'
+    permissions:
+      contents: read
+
+  update-aqua-checksums:
+    uses: ./.github/workflows/wc-update-aqua-checksums.yaml
+    secrets: inherit
+    needs: path-filter
+    if: needs.path-filter.outputs.update-aqua-checksums == 'true'
+    permissions:
+      contents: read
+
+  test:
+    uses: ./.github/workflows/wc-test.yaml
+    permissions: {}
