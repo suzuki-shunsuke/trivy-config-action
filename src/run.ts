@@ -108,7 +108,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
           url: misconfig.PrimaryURL,
         },
         location: {
-          path: misconfig.Occurrences[0].Filename,
+          path: result.Target,
           range: {
             start: {
               line: misconfig.CauseMetadata.StartLine,

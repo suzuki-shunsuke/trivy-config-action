@@ -11054,7 +11054,7 @@ const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
                     url: misconfig.PrimaryURL,
                 },
                 location: {
-                    path: misconfig.Occurrences[0].Filename,
+                    path: result.Target,
                     range: {
                         start: {
                             line: misconfig.CauseMetadata.StartLine,
