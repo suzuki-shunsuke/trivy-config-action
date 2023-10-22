@@ -11095,6 +11095,9 @@ ${table}`;
         cwd: inputs.workingDirectory,
         env: Object.assign(Object.assign({}, process.env), { REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken }),
     });
+    if (out.exitCode != 0) {
+        throw "trivy failed";
+    }
 });
 exports.run = run;
 
