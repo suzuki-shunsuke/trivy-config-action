@@ -13,6 +13,10 @@ inputs:
     description: 'Whether a comment is posted with github-comment'
     required: false
     default: 'false'
+  config_path:
+    description: 'Path to trivy config file'
+    required: false
+    default: 'trivy.yaml'
 runs:
   using: node20
   main: dist/index.js

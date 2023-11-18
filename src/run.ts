@@ -7,6 +7,7 @@ type Inputs = {
   workingDirectory: string
   githubToken: string
   githubComment: boolean
+  configPath: string
 }
 
 class DiagnosticCode {
@@ -82,7 +83,7 @@ function getURL(result: any): string {
 
 export const run = async (inputs: Inputs): Promise<void> => {
   core.info('Running trivy config');
-  const args = ['config', '--format', 'json', '.'];
+  const args = ['config', '--format', 'json', '--config', inputs.configPath, '.'];
   const out = await exec.getExecOutput('trivy', args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
