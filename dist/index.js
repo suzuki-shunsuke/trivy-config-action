@@ -10907,6 +10907,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         workingDirectory: core.getInput('working_directory', { required: false }),
         githubToken: core.getInput('github_token', { required: true }),
         githubComment: core.getBooleanInput('github_comment', { required: true }),
+        configPath: core.getInput('config_path', { required: false }),
     });
 });
 main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)));
@@ -11028,7 +11029,7 @@ function getURL(result) {
 }
 const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
     core.info('Running trivy config');
-    const args = ['config', '--format', 'json', '.'];
+    const args = ['config', '--format', 'json', '--config', inputs.configPath, '.'];
     const out = yield exec.getExecOutput('trivy', args, {
         cwd: inputs.workingDirectory,
         ignoreReturnCode: true,

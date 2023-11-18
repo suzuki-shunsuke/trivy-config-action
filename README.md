@@ -28,6 +28,7 @@ It allows to install tools outside this action.
     github_token: ${{github.token}}
     working_directory: foo
     github_comment: 'true'
+    config_path: 'bar/trivy.yaml
 ```
 
 ## Inputs
@@ -43,6 +44,7 @@ name | default value | description
 github_token | `github.token` | GitHub Access Token
 working_directory | "" (current directory) | Woring Directory
 github_comment | `false` | Whether a comment is posted with github-comment
+config_path | `trivy.yaml` | Path to trivy config file
 
 ## Outputs
 
