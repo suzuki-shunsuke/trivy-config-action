@@ -4,7 +4,7 @@ GitHub Actions for [trivy config](https://aquasecurity.github.io/trivy/latest/do
 
 ![image](https://github.com/suzuki-shunsuke/trivy-config-action/assets/13323303/e4d7f6f7-3df3-44bb-8f98-535173ce096e)
 
----
+--
 
 ![image](https://github.com/suzuki-shunsuke/trivy-config-action/assets/13323303/2d0c6224-8ae4-42f0-80d8-06488ff18f56)
 
