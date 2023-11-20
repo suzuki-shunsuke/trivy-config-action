@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "0.38.1",
-    "typescript": "5.2.2"
+    "typescript": "5.3.2"
   },
   "volta": {
     "node": "20.9.0"
