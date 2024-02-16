@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "ncc build src/index.ts --license LICENSE",
-    "fmt-check": "prettier .",
+    "fmt-check": "prettier -c .",
     "fmt": "prettier -w ."
   },
   "dependencies": {
