@@ -19,4 +19,3 @@ jobs:
         with:
           working_directory: tests/failure
           github_comment: "true"
-
