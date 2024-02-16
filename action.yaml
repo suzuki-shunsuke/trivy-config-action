@@ -16,7 +16,6 @@ inputs:
   config_path:
     description: 'Path to trivy config file'
     required: false
-    default: 'trivy.yaml'
 runs:
   using: node20
   main: dist/index.js
