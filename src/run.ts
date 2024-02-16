@@ -1,43 +1,49 @@
-import * as exec from '@actions/exec';
-import * as core from '@actions/core';
-import * as github from '@actions/github';
-import * as path from 'path';
+import * as exec from "@actions/exec";
+import * as core from "@actions/core";
+import * as github from "@actions/github";
+import * as path from "path";
 
 type Inputs = {
-  workingDirectory: string
-  githubToken: string
-  githubComment: boolean
-  configPath: string
-}
+  workingDirectory: string;
+  githubToken: string;
+  githubComment: boolean;
+  configPath: string;
+};
 
 class DiagnosticCode {
-  value = ''
-  url = ''
+  value = "";
+  url = "";
 }
 
 class DiagnosticLocation {
-  path = ''
-  range = new DiagnosticLocationRange()
+  path = "";
+  range = new DiagnosticLocationRange();
 }
 
 class DiagnosticLocationRange {
-  start = new DiagnosticLocationRangePoint()
-  end = new DiagnosticLocationRangePoint()
+  start = new DiagnosticLocationRangePoint();
+  end = new DiagnosticLocationRangePoint();
 }
 
 class DiagnosticLocationRangePoint {
-  line = 0
+  line = 0;
 }
 
 class Diagnostic {
-  message = ''
-  code = new DiagnosticCode()
-  location = new DiagnosticLocation()
-  severity = ''
+  message = "";
+  code = new DiagnosticCode();
+  location = new DiagnosticLocation();
+  severity = "";
 }
 
-function generateTable(diagnostics: Array<Diagnostic>, basePath: string): string {
-  const lines: Array<string> = ['rule | severity | filepath | range | message', '--- | --- | --- | --- | ---'];
+function generateTable(
+  diagnostics: Array<Diagnostic>,
+  basePath: string,
+): string {
+  const lines: Array<string> = [
+    "rule | severity | filepath | range | message",
+    "--- | --- | --- | --- | ---",
+  ];
   for (let i = 0; i < diagnostics.length; i++) {
     const diagnostic = diagnostics[i];
 
@@ -46,8 +52,12 @@ function generateTable(diagnostics: Array<Diagnostic>, basePath: string): string
       rule = `[${diagnostic.code.value}](${diagnostic.code.url})`;
     }
 
-    let range = '';
-    if (diagnostic.location && diagnostic.location.range && diagnostic.location.range.start) {
+    let range = "";
+    if (
+      diagnostic.location &&
+      diagnostic.location.range &&
+      diagnostic.location.range.start
+    ) {
       range = `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`;
     }
 
@@ -56,44 +66,46 @@ function generateTable(diagnostics: Array<Diagnostic>, basePath: string): string
       locPath = path.relative(basePath, diagnostic.location.path);
     }
 
-    lines.push(`${rule} | ${diagnostic.severity} | ${locPath} | ${range} | ${diagnostic.message}`);
+    lines.push(
+      `${rule} | ${diagnostic.severity} | ${locPath} | ${range} | ${diagnostic.message}`,
+    );
   }
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function getSeverity(s: string): string {
-  if (s.startsWith('HIGH') || s.startsWith('CRITICAL')) {
-    return 'ERROR';
+  if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
+    return "ERROR";
   }
-  if (s.startsWith('MEDIUM')) {
-    return 'WARNING';
+  if (s.startsWith("MEDIUM")) {
+    return "WARNING";
   }
-  if (s.startsWith('LOW')) {
-    return 'INFO';
+  if (s.startsWith("LOW")) {
+    return "INFO";
   }
-  return '';
+  return "";
 }
 
 function getURL(result: any): string {
   if (result.links && result.links.length != 0) {
     return result.links[0];
   }
-  return '';
+  return "";
 }
 
 export const run = async (inputs: Inputs): Promise<void> => {
-  core.info('Running trivy config');
-  const args = inputs.configPath ?
-    ['config', '--format', 'json', '--config', inputs.configPath, '.'] :
-    ['config', '--format', 'json', '.'];
-  const out = await exec.getExecOutput('trivy', args, {
+  core.info("Running trivy config");
+  const args = inputs.configPath
+    ? ["config", "--format", "json", "--config", inputs.configPath, "."]
+    : ["config", "--format", "json", "."];
+  const out = await exec.getExecOutput("trivy", args, {
     cwd: inputs.workingDirectory,
     ignoreReturnCode: true,
   });
-  core.info('Parsing trivy config result');
+  core.info("Parsing trivy config result");
   const outJSON = JSON.parse(out.stdout);
   if (outJSON.Results == null) {
-    core.info('trivy config is null');
+    core.info("trivy config is null");
     return;
   }
   const diagnostics = new Array<Diagnostic>();
@@ -135,7 +147,7 @@ export const run = async (inputs: Inputs): Promise<void> => {
 Working Directory: \`${inputs.workingDirectory}\`
 
 ${table}`;
-    await exec.exec('github-comment', ['post', '-stdin-template'], {
+    await exec.exec("github-comment", ["post", "-stdin-template"], {
       input: Buffer.from(githubCommentTemplate),
       env: {
         ...process.env,
@@ -144,23 +156,45 @@ ${table}`;
     });
   }
 
-  const reporter = github.context.eventName == 'pull_request' ? 'github-pr-review' : 'github-check';
-  core.info('Running reviewdog');
-  await exec.exec('reviewdog', ['-f', 'rdjson', '-name', 'trivy', '-filter-mode', 'nofilter', '-reporter', reporter, '-level', 'warning', '-fail-on-error', '1'], {
-    input: Buffer.from(JSON.stringify({
-      source: {
-        name: "trivy",
-        url: "https://github.com/aquasecurity/trivy"
+  const reporter =
+    github.context.eventName == "pull_request"
+      ? "github-pr-review"
+      : "github-check";
+  core.info("Running reviewdog");
+  await exec.exec(
+    "reviewdog",
+    [
+      "-f",
+      "rdjson",
+      "-name",
+      "trivy",
+      "-filter-mode",
+      "nofilter",
+      "-reporter",
+      reporter,
+      "-level",
+      "warning",
+      "-fail-on-error",
+      "1",
+    ],
+    {
+      input: Buffer.from(
+        JSON.stringify({
+          source: {
+            name: "trivy",
+            url: "https://github.com/aquasecurity/trivy",
+          },
+          diagnostics: diagnostics,
+        }),
+      ),
+      cwd: inputs.workingDirectory,
+      env: {
+        ...process.env,
+        REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
       },
-      diagnostics: diagnostics,
-    })),
-    cwd: inputs.workingDirectory,
-    env: {
-      ...process.env,
-      REVIEWDOG_GITHUB_API_TOKEN: inputs.githubToken,
     },
-  });
+  );
   if (out.exitCode != 0) {
     throw "trivy failed";
   }
-}
+};

@@ -2,19 +2,19 @@ name: trivy-config
 description: Run trivy config
 inputs:
   github_token:
-    description: 'GitHub Access Token'
+    description: "GitHub Access Token"
     required: false
     default: ${{ github.token }}
   working_directory:
-    description: 'Working Directory'
+    description: "Working Directory"
     required: false
     default: ""
   github_comment:
-    description: 'Whether a comment is posted with github-comment'
+    description: "Whether a comment is posted with github-comment"
     required: false
-    default: 'false'
+    default: "false"
   config_path:
-    description: 'Path to trivy config file'
+    description: "Path to trivy config file"
     required: false
 runs:
   using: node20
