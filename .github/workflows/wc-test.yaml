@@ -16,3 +16,4 @@ jobs:
         with:
           working_directory: tests/success
           github_comment: "true"
+          config_path: ../trivy-test-2.yaml
