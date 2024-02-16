@@ -1,6 +1,12 @@
 ---
 name: update-aqua-checksums
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      APP_ID:
+        required: true
+      APP_PRIVATE_KEY:
+        required: true
 jobs:
   update-aqua-checksums:
     # Update aqua-checksums.json and push a commit
