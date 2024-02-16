@@ -30273,32 +30273,27 @@ class Diagnostic {
         this.severity = "";
     }
 }
-function generateTable(diagnostics, basePath) {
+const generateTable = (diagnostics, basePath) => {
+    var _a, _b;
     const lines = [
         "rule | severity | filepath | range | message",
         "--- | --- | --- | --- | ---",
     ];
-    for (let i = 0; i < diagnostics.length; i++) {
-        const diagnostic = diagnostics[i];
-        let rule = diagnostic.code.value;
-        if (diagnostic.code.url) {
-            rule = `[${diagnostic.code.value}](${diagnostic.code.url})`;
-        }
-        let range = "";
-        if (diagnostic.location &&
-            diagnostic.location.range &&
-            diagnostic.location.range.start) {
-            range = `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`;
-        }
-        let locPath = diagnostic.location.path;
-        if (path.isAbsolute(diagnostic.location.path)) {
-            locPath = path.relative(basePath, diagnostic.location.path);
-        }
+    for (const diagnostic of diagnostics) {
+        const rule = diagnostic.code.url
+            ? `[${diagnostic.code.value}](${diagnostic.code.url})`
+            : diagnostic.code.value;
+        const range = ((_b = (_a = diagnostic === null || diagnostic === void 0 ? void 0 : diagnostic.location) === null || _a === void 0 ? void 0 : _a.range) === null || _b === void 0 ? void 0 : _b.start)
+            ? `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`
+            : "";
+        const locPath = path.isAbsolute(diagnostic.location.path)
+            ? path.relative(basePath, diagnostic.location.path)
+            : diagnostic.location.path;
         lines.push(`${rule} | ${diagnostic.severity} | ${locPath} | ${range} | ${diagnostic.message}`);
     }
     return lines.join("\n");
-}
-function getSeverity(s) {
+};
+const getSeverity = (s) => {
     if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
         return "ERROR";
     }
@@ -30309,13 +30304,13 @@ function getSeverity(s) {
         return "INFO";
     }
     return "";
-}
-function getURL(result) {
+};
+const getURL = (result) => {
     if (result.links && result.links.length != 0) {
         return result.links[0];
     }
     return "";
-}
+};
 const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
     core.info("Running trivy config");
     const args = inputs.configPath
@@ -30332,13 +30327,11 @@ const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
     const diagnostics = new Array();
-    for (let i = 0; i < outJSON.Results.length; i++) {
-        const result = outJSON.Results[i];
+    for (const result of outJSON.Results) {
         if (result.Misconfigurations == null) {
             continue;
         }
-        for (let j = 0; j < result.Misconfigurations.length; j++) {
-            const misconfig = result.Misconfigurations[j];
+        for (const misconfig of result.Misconfigurations) {
             diagnostics.push({
                 message: misconfig.Message,
                 code: {
