@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "build": "ncc build src/index.ts --license LICENSE"
+    "build": "ncc build src/index.ts --license LICENSE",
+    "fmt-check": "prettier .",
+    "fmt": "prettier -w ."
   },
   "dependencies": {
     "@actions/core": "1.10.1",
@@ -10,6 +12,7 @@
   },
   "devDependencies": {
     "@vercel/ncc": "0.38.1",
+    "prettier": "^3.2.5",
     "typescript": "5.3.3"
   },
   "volta": {
