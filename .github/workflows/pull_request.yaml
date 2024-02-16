@@ -49,7 +49,9 @@ jobs:
 
   enable-auto-merge:
     uses: ./.github/workflows/wc-enable-auto-merge.yaml
-    secrets: inherit
+    secrets:
+      APP_ID: ${{secrets.APP_ID}}
+      APP_PRIVATE_KEY: ${{secrets.APP_PRIVATE_KEY}}
     permissions: {}
     needs:
       - status-check
@@ -71,7 +73,9 @@ jobs:
 
   update-aqua-checksums:
     uses: ./.github/workflows/wc-update-aqua-checksums.yaml
-    secrets: inherit
+    secrets:
+      APP_ID: ${{secrets.APP_ID}}
+      APP_PRIVATE_KEY: ${{secrets.APP_PRIVATE_KEY}}
     needs: path-filter
     if: needs.path-filter.outputs.update-aqua-checksums == 'true'
     permissions:
