@@ -39,12 +39,12 @@ Nothing.
 
 ### Optional Inputs
 
-name | default value | description
---- | --- | ---
-github_token | `github.token` | GitHub Access Token
-working_directory | "" (current directory) | Woring Directory
-github_comment | `false` | Whether a comment is posted with github-comment
-config_path | `trivy.yaml` | Path to trivy config file
+| name              | default value          | description                                     |
+| ----------------- | ---------------------- | ----------------------------------------------- |
+| github_token      | `github.token`         | GitHub Access Token                             |
+| working_directory | "" (current directory) | Woring Directory                                |
+| github_comment    | `false`                | Whether a comment is posted with github-comment |
+| config_path       | `trivy.yaml`           | Path to trivy config file                       |
 
 ## Outputs
 

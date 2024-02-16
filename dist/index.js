@@ -30188,10 +30188,10 @@ const core = __importStar(__nccwpck_require__(2186));
 const run_1 = __nccwpck_require__(7764);
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield (0, run_1.run)({
-        workingDirectory: core.getInput('working_directory', { required: false }),
-        githubToken: core.getInput('github_token', { required: true }),
-        githubComment: core.getBooleanInput('github_comment', { required: true }),
-        configPath: core.getInput('config_path', { required: false }),
+        workingDirectory: core.getInput("working_directory", { required: false }),
+        githubToken: core.getInput("github_token", { required: true }),
+        githubComment: core.getBooleanInput("github_comment", { required: true }),
+        configPath: core.getInput("config_path", { required: false }),
     });
 });
 main().catch((e) => core.setFailed(e instanceof Error ? e.message : JSON.stringify(e)));
@@ -30244,13 +30244,13 @@ const github = __importStar(__nccwpck_require__(5438));
 const path = __importStar(__nccwpck_require__(1017));
 class DiagnosticCode {
     constructor() {
-        this.value = '';
-        this.url = '';
+        this.value = "";
+        this.url = "";
     }
 }
 class DiagnosticLocation {
     constructor() {
-        this.path = '';
+        this.path = "";
         this.range = new DiagnosticLocationRange();
     }
 }
@@ -30267,22 +30267,27 @@ class DiagnosticLocationRangePoint {
 }
 class Diagnostic {
     constructor() {
-        this.message = '';
+        this.message = "";
         this.code = new DiagnosticCode();
         this.location = new DiagnosticLocation();
-        this.severity = '';
+        this.severity = "";
     }
 }
 function generateTable(diagnostics, basePath) {
-    const lines = ['rule | severity | filepath | range | message', '--- | --- | --- | --- | ---'];
+    const lines = [
+        "rule | severity | filepath | range | message",
+        "--- | --- | --- | --- | ---",
+    ];
     for (let i = 0; i < diagnostics.length; i++) {
         const diagnostic = diagnostics[i];
         let rule = diagnostic.code.value;
         if (diagnostic.code.url) {
             rule = `[${diagnostic.code.value}](${diagnostic.code.url})`;
         }
-        let range = '';
-        if (diagnostic.location && diagnostic.location.range && diagnostic.location.range.start) {
+        let range = "";
+        if (diagnostic.location &&
+            diagnostic.location.range &&
+            diagnostic.location.range.start) {
             range = `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`;
         }
         let locPath = diagnostic.location.path;
@@ -30291,39 +30296,39 @@ function generateTable(diagnostics, basePath) {
         }
         lines.push(`${rule} | ${diagnostic.severity} | ${locPath} | ${range} | ${diagnostic.message}`);
     }
-    return lines.join('\n');
+    return lines.join("\n");
 }
 function getSeverity(s) {
-    if (s.startsWith('HIGH') || s.startsWith('CRITICAL')) {
-        return 'ERROR';
+    if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
+        return "ERROR";
     }
-    if (s.startsWith('MEDIUM')) {
-        return 'WARNING';
+    if (s.startsWith("MEDIUM")) {
+        return "WARNING";
     }
-    if (s.startsWith('LOW')) {
-        return 'INFO';
+    if (s.startsWith("LOW")) {
+        return "INFO";
     }
-    return '';
+    return "";
 }
 function getURL(result) {
     if (result.links && result.links.length != 0) {
         return result.links[0];
     }
-    return '';
+    return "";
 }
 const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
-    core.info('Running trivy config');
-    const args = inputs.configPath ?
-        ['config', '--format', 'json', '--config', inputs.configPath, '.'] :
-        ['config', '--format', 'json', '.'];
-    const out = yield exec.getExecOutput('trivy', args, {
+    core.info("Running trivy config");
+    const args = inputs.configPath
+        ? ["config", "--format", "json", "--config", inputs.configPath, "."]
+        : ["config", "--format", "json", "."];
+    const out = yield exec.getExecOutput("trivy", args, {
         cwd: inputs.workingDirectory,
         ignoreReturnCode: true,
     });
-    core.info('Parsing trivy config result');
+    core.info("Parsing trivy config result");
     const outJSON = JSON.parse(out.stdout);
     if (outJSON.Results == null) {
-        core.info('trivy config is null');
+        core.info("trivy config is null");
         return;
     }
     const diagnostics = new Array();
@@ -30364,18 +30369,33 @@ const run = (inputs) => __awaiter(void 0, void 0, void 0, function* () {
 Working Directory: \`${inputs.workingDirectory}\`
 
 ${table}`;
-        yield exec.exec('github-comment', ['post', '-stdin-template'], {
+        yield exec.exec("github-comment", ["post", "-stdin-template"], {
             input: Buffer.from(githubCommentTemplate),
             env: Object.assign(Object.assign({}, process.env), { GITHUB_TOKEN: inputs.githubToken }),
         });
     }
-    const reporter = github.context.eventName == 'pull_request' ? 'github-pr-review' : 'github-check';
-    core.info('Running reviewdog');
-    yield exec.exec('reviewdog', ['-f', 'rdjson', '-name', 'trivy', '-filter-mode', 'nofilter', '-reporter', reporter, '-level', 'warning', '-fail-on-error', '1'], {
+    const reporter = github.context.eventName == "pull_request"
+        ? "github-pr-review"
+        : "github-check";
+    core.info("Running reviewdog");
+    yield exec.exec("reviewdog", [
+        "-f",
+        "rdjson",
+        "-name",
+        "trivy",
+        "-filter-mode",
+        "nofilter",
+        "-reporter",
+        reporter,
+        "-level",
+        "warning",
+        "-fail-on-error",
+        "1",
+    ], {
         input: Buffer.from(JSON.stringify({
             source: {
                 name: "trivy",
-                url: "https://github.com/aquasecurity/trivy"
+                url: "https://github.com/aquasecurity/trivy",
             },
             diagnostics: diagnostics,
         })),
