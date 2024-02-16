@@ -36,44 +36,32 @@ class Diagnostic {
   severity = "";
 }
 
-function generateTable(
+const generateTable = (
   diagnostics: Array<Diagnostic>,
   basePath: string,
-): string {
+): string => {
   const lines: Array<string> = [
     "rule | severity | filepath | range | message",
     "--- | --- | --- | --- | ---",
   ];
-  for (let i = 0; i < diagnostics.length; i++) {
-    const diagnostic = diagnostics[i];
-
-    let rule = diagnostic.code.value;
-    if (diagnostic.code.url) {
-      rule = `[${diagnostic.code.value}](${diagnostic.code.url})`;
-    }
-
-    let range = "";
-    if (
-      diagnostic.location &&
-      diagnostic.location.range &&
-      diagnostic.location.range.start
-    ) {
-      range = `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`;
-    }
-
-    let locPath = diagnostic.location.path;
-    if (path.isAbsolute(diagnostic.location.path)) {
-      locPath = path.relative(basePath, diagnostic.location.path);
-    }
-
+  for (const diagnostic of diagnostics) {
+    const rule = diagnostic.code.url
+      ? `[${diagnostic.code.value}](${diagnostic.code.url})`
+      : diagnostic.code.value;
+    const range = diagnostic?.location?.range?.start
+      ? `${diagnostic.location.range.start.line} ... ${diagnostic.location.range.end.line}`
+      : "";
+    const locPath = path.isAbsolute(diagnostic.location.path)
+      ? path.relative(basePath, diagnostic.location.path)
+      : diagnostic.location.path;
     lines.push(
       `${rule} | ${diagnostic.severity} | ${locPath} | ${range} | ${diagnostic.message}`,
     );
   }
   return lines.join("\n");
-}
+};
 
-function getSeverity(s: string): string {
+const getSeverity = (s: string): string => {
   if (s.startsWith("HIGH") || s.startsWith("CRITICAL")) {
     return "ERROR";
   }
@@ -84,14 +72,14 @@ function getSeverity(s: string): string {
     return "INFO";
   }
   return "";
-}
+};
 
-function getURL(result: any): string {
+const getURL = (result: any): string => {
   if (result.links && result.links.length != 0) {
     return result.links[0];
   }
   return "";
-}
+};
 
 export const run = async (inputs: Inputs): Promise<void> => {
   core.info("Running trivy config");
@@ -109,13 +97,11 @@ export const run = async (inputs: Inputs): Promise<void> => {
     return;
   }
   const diagnostics = new Array<Diagnostic>();
-  for (let i = 0; i < outJSON.Results.length; i++) {
-    const result = outJSON.Results[i];
+  for (const result of outJSON.Results) {
     if (result.Misconfigurations == null) {
       continue;
     }
-    for (let j = 0; j < result.Misconfigurations.length; j++) {
-      const misconfig = result.Misconfigurations[j];
+    for (const misconfig of result.Misconfigurations) {
       diagnostics.push({
         message: misconfig.Message,
         code: {
