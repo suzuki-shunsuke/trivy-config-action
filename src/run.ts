@@ -181,6 +181,6 @@ ${table}`;
     },
   );
   if (out.exitCode != 0) {
-    throw "trivy failed";
+    throw new Error("trivy failed");
   }
 };
