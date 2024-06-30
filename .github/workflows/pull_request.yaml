@@ -4,6 +4,7 @@ on: pull_request
 
 jobs:
   path-filter:
+    timeout-minutes: 30
     outputs:
       update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
       renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
@@ -30,6 +31,7 @@ jobs:
               - aqua/imports/ghalint.yaml
 
   status-check:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     needs:
       - update-aqua-checksums

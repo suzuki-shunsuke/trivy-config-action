@@ -6,6 +6,7 @@ on:
 
 jobs:
   test-label:
+    timeout-minutes: 30
     if: contains(github.event.pull_request.labels.*.name, 'test')
     runs-on: ubuntu-latest
     permissions:
