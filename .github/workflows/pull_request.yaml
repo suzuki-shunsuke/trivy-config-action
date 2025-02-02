@@ -1,10 +1,8 @@
 name: test
-
 on: pull_request
-
 jobs:
   path-filter:
-    timeout-minutes: 30
+    timeout-minutes: 10
     outputs:
       update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
       renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
@@ -44,17 +42,6 @@ jobs:
     if: failure()
     steps:
       - run: exit 1
-
-  enable-auto-merge:
-    uses: ./.github/workflows/wc-enable-auto-merge.yaml
-    secrets:
-      APP_ID: ${{secrets.APP_ID}}
-      APP_PRIVATE_KEY: ${{secrets.APP_PRIVATE_KEY}}
-    permissions: {}
-    needs:
-      - status-check
-    if: |
-      ! failure() && ! cancelled() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
 
   ghalint:
     uses: ./.github/workflows/wc-ghalint.yaml
