@@ -14,7 +14,7 @@
   "devDependencies": {
     "@vercel/ncc": "0.38.3",
     "prettier": "3.5.2",
-    "typescript": "5.7.3"
+    "typescript": "5.8.2"
   },
   "volta": {
     "node": "20.18.3"
